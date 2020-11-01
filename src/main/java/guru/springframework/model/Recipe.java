@@ -1,6 +1,7 @@
 package guru.springframework.model;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -20,7 +21,7 @@ public class Recipe {
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
-    private Set<Ingredient> ingredients;
+    private Set<Ingredient> ingredients = new HashSet<>();
     @Lob
     private byte[] images;
     @OneToOne(cascade = CascadeType.ALL)
@@ -29,7 +30,7 @@ public class Recipe {
     @JoinTable(name = "recipe_category",
             joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories;
+    private Set<Category> categories = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -111,12 +112,25 @@ public class Recipe {
         this.notes = notes;
     }
 
+    public Notes addNotes(Notes notesToAdd) {
+        this.setNotes(notesToAdd);
+        notesToAdd.setRecipe(this);
+        return notesToAdd;
+    }
+
     public Set<Ingredient> getIngredients() {
         return ingredients;
     }
 
     public void setIngredients(Set<Ingredient> ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public void addIngredients(Set<Ingredient> ingredientsToSave) {
+        ingredientsToSave.forEach(ingredient -> {
+            ingredient.setRecipe(this);
+        });
+        ingredients.addAll(ingredientsToSave);
     }
 
     public Difficulty getDifficulty() {
@@ -133,5 +147,12 @@ public class Recipe {
 
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
+    }
+
+    public void addCategories(Set<Category> categoryToAdd) {
+        categoryToAdd.forEach(category -> {
+            category.addRecipe(this);
+        });
+        categories.addAll(categoryToAdd);
     }
 }

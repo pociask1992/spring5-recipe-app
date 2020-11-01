@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class RecipeServiceImpl implements RecipeService{
+public class RecipeServiceImpl implements RecipeService {
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -31,10 +31,10 @@ public class RecipeServiceImpl implements RecipeService{
         final Iterable<Recipe> allRecipes = recipeRepository.findAll();
         Set<Recipe> toReturn = new HashSet<>();
         if (Optional.ofNullable(allRecipes).isPresent()) {
-            allRecipes.forEach(localRecipe -> {
-                        saveImage(localRecipe);
-                    }
-            );
+//            allRecipes.forEach(localRecipe -> {
+//                        saveImage(localRecipe);
+//                    }
+//            );
             allRecipes.spliterator().forEachRemaining(toReturn::add);
         }
         return toReturn;
@@ -46,18 +46,35 @@ public class RecipeServiceImpl implements RecipeService{
             final byte[] images = recipe.getImages();
             if (Optional.ofNullable(images).isEmpty()) {
                 int recid = recipe.getId().intValue();
-                final Resource resource = resourceLoader.getResource(String.format("classpath:fotos/%d.jpg", recid));
-                try {
-                    final File file = resource.getFile();
-                    final byte[] readBytes = Files.readAllBytes(file.toPath());
-                    if (Optional.ofNullable(readBytes).isPresent() && readBytes.length > 0) {
-                        recipe.setImages(readBytes);
-                        recipeRepository.save(recipe);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                final byte[] readBytes = readImageByName(String.valueOf(recid));
+                if (Optional.ofNullable(readBytes).isPresent() && readBytes.length > 0) {
+                    recipe.setImages(readBytes);
+                    recipeRepository.save(recipe);
                 }
             }
         }
+    }
+
+    @Override
+    public byte[] readImageByName(String imageName) {
+        final Resource resource = resourceLoader.getResource(String.format("classpath:fotos/%s.jpg", imageName));
+        byte[] readBytes = null;
+        try {
+            final File file = resource.getFile();
+            readBytes = Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return readBytes;
+    }
+
+    @Override
+    public void save(Recipe recipeToSave) {
+        recipeRepository.save(recipeToSave);
+    }
+
+    @Override
+    public Iterable<Recipe> save(Set<Recipe> recipesToSave) {
+        return recipeRepository.saveAll(recipesToSave);
     }
 }
