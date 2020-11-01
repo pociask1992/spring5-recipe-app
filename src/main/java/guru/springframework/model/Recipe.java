@@ -22,7 +22,7 @@ public class Recipe {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
     private Set<Ingredient> ingredients;
     @Lob
-    private Byte[] images;
+    private byte[] images;
     @OneToOne(cascade = CascadeType.ALL)
     private Notes notes;
     @ManyToMany
@@ -95,11 +95,11 @@ public class Recipe {
         this.directions = directions;
     }
 
-    public Byte[] getImages() {
+    public byte[] getImages() {
         return images;
     }
 
-    public void setImages(Byte[] images) {
+    public void setImages(byte[] images) {
         this.images = images;
     }
 
@@ -125,5 +125,13 @@ public class Recipe {
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 }
