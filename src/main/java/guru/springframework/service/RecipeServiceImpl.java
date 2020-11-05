@@ -2,6 +2,7 @@ package guru.springframework.service;
 
 import guru.springframework.model.Recipe;
 import guru.springframework.repository.RecipeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class RecipeServiceImpl implements RecipeService {
 
@@ -28,13 +30,10 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public Set<Recipe> findAll() {
+        log.debug("Invoking RecipeServiceImpl.findAll");
         final Iterable<Recipe> allRecipes = recipeRepository.findAll();
         Set<Recipe> toReturn = new HashSet<>();
         if (Optional.ofNullable(allRecipes).isPresent()) {
-//            allRecipes.forEach(localRecipe -> {
-//                        saveImage(localRecipe);
-//                    }
-//            );
             allRecipes.spliterator().forEachRemaining(toReturn::add);
         }
         return toReturn;
@@ -42,6 +41,7 @@ public class RecipeServiceImpl implements RecipeService {
 
 
     private void saveImage(Recipe recipe) {
+        log.debug("Invoking RecipeServiceImpl.saveImage");
         if (Optional.ofNullable(recipe).isPresent()) {
             final byte[] images = recipe.getImages();
             if (Optional.ofNullable(images).isEmpty()) {
@@ -57,6 +57,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public byte[] readImageByName(String imageName) {
+        log.debug("Invoking RecipeServiceImpl.readImageByName");
         final Resource resource = resourceLoader.getResource(String.format("classpath:fotos/%s.jpg", imageName));
         byte[] readBytes = null;
         try {
@@ -70,11 +71,13 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void save(Recipe recipeToSave) {
+        log.debug("RecipeServiceImpl.save");
         recipeRepository.save(recipeToSave);
     }
 
     @Override
     public Iterable<Recipe> save(Set<Recipe> recipesToSave) {
+        log.debug("RecipeServiceImpl.save");
         return recipeRepository.saveAll(recipesToSave);
     }
 }

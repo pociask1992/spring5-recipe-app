@@ -5,6 +5,7 @@ import guru.springframework.service.CategoryService;
 import guru.springframework.service.IngredientService;
 import guru.springframework.service.RecipeService;
 import guru.springframework.service.UnitOfMeasureService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Component
 public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -48,6 +50,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private Recipe getGuacamole() {
+        log.info("DataLoader.getGuacamole");
         Recipe guacamole = new Recipe();
         guacamole.setDescription("Perfect Guacamole");
         guacamole.setDifficulty(Difficulty.EASY);
@@ -69,6 +72,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         return recipeService.readImageByName(imageName);
     }
     private void assignCategoryToGuacamole(Recipe recipe) {
+        log.info("DataLoader.assignCategoryToGuacamole");
         final Category hotDish = categoryService.findByDescription("Hot Dish");
         if(Optional.ofNullable(hotDish).isPresent()) {
             Set<Category> categories = Set.of(hotDish);
@@ -77,6 +81,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private void saveUnitOfMeasure() {
+        log.info("DataLoader.saveUnitOfMeasure");
         UnitOfMeasure pieces = new UnitOfMeasure();
         pieces.setDescription("Piece(s)");
 
@@ -94,6 +99,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private Notes getGuacamoleNotes() {
+        log.info("DataLoader.getGuacamoleNotes");
         Notes notes = new Notes();
         notes.setRecipeNotes("All you really need to make guacamole is ripe avocados and salt. After that, a little lime or lemon juice a splash of acidity will help to balance the richness of the avocado." +
                 " Then if you want, add chopped cilantro, chiles, onion, and/or tomato.");
@@ -102,6 +108,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private void saveCategory() {
+        log.info("DataLoader.saveCategory");
         Category hotDish = new Category();
         hotDish.setDescription("Hot dish");
 
@@ -109,6 +116,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private void assignIngredientsToGuacamole(Recipe recipe) {
+        log.info("DataLoader.assignIngredientsToGuacamole");
         Set<Ingredient> ingredients = new HashSet<>();
 
         Ingredient avocados = new Ingredient();
@@ -171,11 +179,11 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         tortilla.setUnitOfMeasure(getUnitOfMeasureByDescription("Piece(s)"));
         ingredients.add(tortilla);
 
-//        ingredientService.save(ingredients);
         recipe.addIngredients(ingredients);
     }
 
     private UnitOfMeasure getUnitOfMeasureByDescription(String description) {
+        log.info("DataLoader.getUnitOfMeasureByDescription");
         return unitOfMeasureService.findByDescription(description);
     }
 }
