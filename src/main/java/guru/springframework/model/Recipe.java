@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(exclude = {"ingredients", "categories"})
+@EqualsAndHashCode(exclude = {"ingredients", "categories", "notes"})
 @Entity
 public class Recipe {
 
