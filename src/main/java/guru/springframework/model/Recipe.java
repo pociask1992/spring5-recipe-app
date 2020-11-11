@@ -2,6 +2,7 @@ package guru.springframework.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(exclude = {"ingredients", "categories", "notes"})
+@NoArgsConstructor
 @Entity
 public class Recipe {
 
@@ -37,6 +39,10 @@ public class Recipe {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();
 
+
+    public Recipe(Long id) {
+        this.id = id;
+    }
 
     public Notes addNotes(Notes notesToAdd) {
         this.setNotes(notesToAdd);
