@@ -12,7 +12,7 @@
 
 <h2>Recipe list</h2>
 <table class="table table-striped">
-    <div th:each="recipe : ${recipes.keySet()}">
+    <div th:each="recipe : ${recipes}">
         <thead>
         <tr>
             <h3>
@@ -52,7 +52,7 @@
         <tr>
             <td colspan="10">
                 <center>
-                    <img th:src="${'data:image/jpeg;charset=utf-8;base64,' + {recipes.get(recipe)}}" alt="">
+                    <img th:src="${'data:image/jpeg;charset=utf-8;base64,' + {recipe.base64Image}}" alt="">
                 </center>
             </td>
         </tr>
