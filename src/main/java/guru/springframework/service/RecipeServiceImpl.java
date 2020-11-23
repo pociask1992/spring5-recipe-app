@@ -3,6 +3,7 @@ package guru.springframework.service;
 import guru.springframework.model.Recipe;
 import guru.springframework.repository.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -34,7 +35,11 @@ public class RecipeServiceImpl implements RecipeService {
         final Iterable<Recipe> allRecipes = recipeRepository.findAll();
         Set<Recipe> toReturn = new HashSet<>();
         if (Optional.ofNullable(allRecipes).isPresent()) {
-            allRecipes.spliterator().forEachRemaining(toReturn::add);
+            allRecipes.spliterator().forEachRemaining(
+                    recipeToAdd -> {
+                        recipeToAdd.setBase64Image(Base64.encodeBase64String(recipeToAdd.getImages()));
+                        toReturn.add(recipeToAdd);
+                    });
         }
         return toReturn;
     }
