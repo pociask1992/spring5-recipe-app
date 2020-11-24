@@ -7,6 +7,7 @@ import java.util.Set;
 public interface RecipeService {
 
     Set<Recipe> findAll();
+    Recipe findById(Long recipeId);
     byte[] readImageByName(String imageName);
     void save(Recipe recipeToSave);
     Iterable<Recipe> save(Set<Recipe> recipesToSave);

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      th:href="@{/webjars/bootstrap/4.5.3/css/bootstrap.min.css}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/webjars/jquery/3.5.1/jquery.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title th:text="Recipe + ' ' + ${recipe.description}">Recipe</title>
+</head>
+<body>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <h3>
+            <th th:text="${recipe.description}" colspan="11" class="text-center"></th>
+        </h3>
+    </tr>
+    <tr>
+        <th>Id</th>
+        <th>Description</th>
+        <th>Preparation time</th>
+        <th>Cook time</th>
+        <th>Servings</th>
+        <th>Source</th>
+        <th>Url</th>
+        <th>Directions</th>
+        <th>Difficulty</th>
+        <th>Categories</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td th:text="${recipe.id}"></td>
+        <td th:text="${recipe.description}"></td>
+        <td th:text="${recipe.prepTime}"></td>
+        <td th:text="${recipe.cookTime}"></td>
+        <td th:text="${recipe.servings}"></td>
+        <td>
+            <a th:href="${recipe.source}" th:text="${recipe.source}"> </a>
+        </td>
+        <td>
+            <a th:href="${recipe.url}" th:text="${recipe.url}"> </a>
+        </td>
+        <td th:text="${recipe.directions}"></td>
+        <td th:text="${recipe.difficulty}"></td>
+        <td>category todo</td>
+    </tr>
+    <tr>
+        <td colspan="10">
+            <center>
+                <img th:src="${'data:image/jpeg;charset=utf-8;base64,' + {recipe.base64Image}}" alt="">
+            </center>
+        </td>
+    </tr>
+    <tr>
+        <th colspan="11" class="text-center">Ingredients</th>
+    </tr>
+    <tr th:each="ingr : ${recipe.ingredients}">
+        <td th:text="|${ingr.amount} ${ingr.unitOfMeasure.description} ${ingr.description}|" colspan="10"
+            class="text-center"></td>
+    </tr>
+    <tr>
+        <th colspan="11" class="text-center">Notes</th>
+    </tr>
+    <tr>
+        <td th:text="${recipe.notes.recipeNotes}" colspan="10" class="text-center"></td>
+    </tr>
+    <tr>
+        <td colspan="10">
+            <div class="text-center">
+                <a th:href="@{/recipe/}">
+                    <button id="singlebutton" name="singlebutton" class="btn btn-primary">Recipe List</button>
+                </a>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

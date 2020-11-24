@@ -35,13 +35,22 @@ public class RecipeServiceImpl implements RecipeService {
         final Iterable<Recipe> allRecipes = recipeRepository.findAll();
         Set<Recipe> toReturn = new HashSet<>();
         if (Optional.ofNullable(allRecipes).isPresent()) {
-            allRecipes.spliterator().forEachRemaining(
-                    recipeToAdd -> {
-                        recipeToAdd.setBase64Image(Base64.encodeBase64String(recipeToAdd.getImages()));
-                        toReturn.add(recipeToAdd);
-                    });
+            allRecipes.spliterator().forEachRemaining(toReturn::add);
         }
         return toReturn;
+    }
+
+    @Override
+    public Recipe findById(Long recipeId) {
+        log.debug(String.format("Invoking RecipeServiceImpl.findById(%d)", recipeId));
+        Optional<Recipe> toReturn;
+        if (Optional.ofNullable(recipeId).isPresent()) {
+            toReturn = recipeRepository.findById(recipeId);
+            toReturn.ifPresent(recipe -> recipe.setBase64Image(Base64.encodeBase64String(recipe.getImages())));
+        } else {
+            throw new RuntimeException("RecipeServiceImpl.findById recipeId cannot be null.");
+        }
+        return toReturn.orElse(null);
     }
 
 
