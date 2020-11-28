@@ -1,5 +1,6 @@
 package guru.springframework.controller;
 
+import guru.springframework.converter.RecipeConverterToDTO;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
 import org.springframework.stereotype.Controller;
@@ -15,21 +16,23 @@ import java.util.Set;
 public class RecipeController {
 
     private final RecipeService recipeService;
-
-    public RecipeController(RecipeService recipeService) {
+    private final RecipeConverterToDTO recipeConverterToDTO;
+    public RecipeController(RecipeService recipeService,
+                            RecipeConverterToDTO recipeConverterToDTO) {
         this.recipeService = recipeService;
+        this.recipeConverterToDTO = recipeConverterToDTO;
     }
 
     @GetMapping({"", "/", "index", "index.html"})
     public String findAll(Model model) {
         final Set<Recipe> recipes = recipeService.findAll();
-        model.addAttribute("recipes", recipes);
+        model.addAttribute("recipes", recipeConverterToDTO.convert(recipes));
         return "/recipe/index";
     }
 
     @GetMapping("/findById/{id}")
     public String findById(Model model, @PathVariable("id") Long recipeId) {
-        model.addAttribute("recipe", recipeService.findById(recipeId));
+        model.addAttribute("recipe", recipeConverterToDTO.convert(recipeService.findById(recipeId)));
         return "/recipe/detailed_recipe";
     }
 }

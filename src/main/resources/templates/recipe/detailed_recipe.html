@@ -59,15 +59,15 @@
     <tr>
         <th colspan="11" class="text-center">Ingredients</th>
     </tr>
-    <tr th:each="ingr : ${recipe.ingredients}">
-        <td th:text="|${ingr.amount} ${ingr.unitOfMeasure.description} ${ingr.description}|" colspan="10"
+    <tr th:each="ingr : ${recipe.ingredientsDTO}">
+        <td th:text="|${ingr.amount} ${ingr.unitOfMeasureDTO.description} ${ingr.description}|" colspan="10"
             class="text-center"></td>
     </tr>
     <tr>
         <th colspan="11" class="text-center">Notes</th>
     </tr>
     <tr>
-        <td th:text="${recipe.notes.recipeNotes}" colspan="10" class="text-center"></td>
+        <td th:text="${recipe.notesDTO.recipeNotes}" colspan="10" class="text-center"></td>
     </tr>
     <tr>
         <td colspan="10">

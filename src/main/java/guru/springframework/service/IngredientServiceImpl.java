@@ -5,6 +5,7 @@ import guru.springframework.repository.IngredientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Slf4j
@@ -15,6 +16,12 @@ public class IngredientServiceImpl implements IngredientService {
 
     public IngredientServiceImpl(IngredientRepository ingredientRepository) {
         this.ingredientRepository = ingredientRepository;
+    }
+
+    @Override
+    public Iterable<Ingredient> findByIds(Collection<Long> ingredientIds) {
+        log.debug("IngredientServiceImpl.findByIds");
+        return ingredientRepository.findAllById(ingredientIds);
     }
 
     @Override

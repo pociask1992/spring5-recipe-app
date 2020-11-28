@@ -5,6 +5,8 @@ import guru.springframework.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+
 @Slf4j
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -13,6 +15,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
+    }
+
+    @Override
+    public Iterable<Category> findByIds(Collection<Long> categoryIds) {
+        return categoryRepository.findAllById(categoryIds);
     }
 
     @Override

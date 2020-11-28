@@ -1,8 +1,10 @@
 package guru.springframework.controller;
 
+import guru.springframework.converter.*;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
 import org.hamcrest.core.IsNull;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,18 +26,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RecipeControllerTest {
 
     private RecipeController recipeController;
+    private RecipeConverterToDTO recipeConverterToDTO;
+    private NotesConverterToDTO notesConverterToDTO;
+    private CategoryConverterToDTO categoryConverterToDTO;
+    private IngredientConverterToDTO ingredientConverterToDTO;
     @Mock
     private RecipeService recipeService;
     @Mock
     private Model model;
     MockMvc mockMvc;
 
+    private AutoCloseable autoCloseable;
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        autoCloseable = MockitoAnnotations.openMocks(this  );
 
-        recipeController = new RecipeController(recipeService);
+        notesConverterToDTO = new NotesConverterToDTO();
+        categoryConverterToDTO = new CategoryConverterToDTO();
+        ingredientConverterToDTO = new IngredientConverterToDTO(new UnitOfMeasureConverterToDTO());
+        recipeController = new RecipeController(recipeService, recipeConverterToDTO);
+        recipeConverterToDTO = new RecipeConverterToDTO(notesConverterToDTO, categoryConverterToDTO, ingredientConverterToDTO);
         mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+    }
+
+    @AfterEach
+    void releaseMock() throws Exception {
+        autoCloseable.close();
     }
 
     @Test

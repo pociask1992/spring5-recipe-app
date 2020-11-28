@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -53,6 +54,15 @@ public class RecipeServiceImpl implements RecipeService {
         return toReturn.orElse(null);
     }
 
+    @Override
+    public Set<Recipe> findByIds(Collection<Long> ids) {
+        Set<Recipe> toReturn = new HashSet<>();
+        if(Optional.ofNullable(ids).isPresent() && !ids.isEmpty()) {
+            final Iterable<Recipe> foundIds = recipeRepository.findAllById(ids);
+            foundIds.forEach(toReturn::add);
+        }
+        return toReturn;
+    }
 
     private void saveImage(Recipe recipe) {
         log.debug("Invoking RecipeServiceImpl.saveImage");

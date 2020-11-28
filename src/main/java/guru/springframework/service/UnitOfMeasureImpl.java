@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -26,6 +27,12 @@ public class UnitOfMeasureImpl implements UnitOfMeasureService {
         Set<UnitOfMeasure> unitOfMeasureSet = new HashSet<>();
         foundUnitsOfMeasure.iterator().forEachRemaining(unitOfMeasureSet::add);
         return unitOfMeasureSet;
+    }
+
+    @Override
+    public Optional<UnitOfMeasure> findById(Long id) {
+        log.debug("Invoking UnitOfMeasureImpl.findById");
+        return unitOfMeasureRepository.findById(id);
     }
 
     @Override
