@@ -1,15 +1,17 @@
 package guru.springframework.controller;
 
-import guru.springframework.converter.*;
+import guru.springframework.converter.RecipeConverterFromDTO;
+import guru.springframework.converter.RecipeConverterToDTO;
+import guru.springframework.dto.RecipeDTO;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
-import org.hamcrest.core.IsNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
@@ -18,40 +20,32 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ExtendWith({MockitoExtension.class})
 class RecipeControllerTest {
 
-    private RecipeController recipeController;
+    @Mock
     private RecipeConverterToDTO recipeConverterToDTO;
-    private NotesConverterToDTO notesConverterToDTO;
-    private CategoryConverterToDTO categoryConverterToDTO;
-    private IngredientConverterToDTO ingredientConverterToDTO;
+    @Mock
+    private RecipeConverterFromDTO recipeConverterFromDTO;
     @Mock
     private RecipeService recipeService;
+
+
     @Mock
     private Model model;
     MockMvc mockMvc;
 
-    private AutoCloseable autoCloseable;
+
+    @InjectMocks
+    private RecipeController recipeController;
+
     @BeforeEach
     void setUp() {
-        autoCloseable = MockitoAnnotations.openMocks(this  );
-
-        notesConverterToDTO = new NotesConverterToDTO();
-        categoryConverterToDTO = new CategoryConverterToDTO();
-        ingredientConverterToDTO = new IngredientConverterToDTO(new UnitOfMeasureConverterToDTO());
-        recipeController = new RecipeController(recipeService, recipeConverterToDTO);
-        recipeConverterToDTO = new RecipeConverterToDTO(notesConverterToDTO, categoryConverterToDTO, ingredientConverterToDTO);
         mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
-    }
-
-    @AfterEach
-    void releaseMock() throws Exception {
-        autoCloseable.close();
     }
 
     @Test
@@ -64,16 +58,32 @@ class RecipeControllerTest {
     @Test
     void findAll() {
         //given
-        Set<Recipe> recipesMockToReturn = new HashSet<>(Set.of(new Recipe(1L), new Recipe(2L)));
+        Long id1 = 1L;
+        Long id2 = 2L;
+        final HashSet<Recipe> recipesSpy = spy(new HashSet<>());
+        final Recipe recipe1Spy = spy(Recipe.class);
+        recipe1Spy.setId(id1);
+        recipesSpy.add(recipe1Spy);
+        final Recipe recipe2Spy = spy(Recipe.class);
+        recipe2Spy.setId(id2);
+        recipesSpy.add(recipe2Spy);
+
+        final HashSet<RecipeDTO> recipesDTOSpy = spy(new HashSet<>());
+        final RecipeDTO recipeDTO1Spy = spy(RecipeDTO.class);
+        recipeDTO1Spy.setId(id1);
+        recipesDTOSpy.add(recipeDTO1Spy);
+        final RecipeDTO recipeDTO2Spy = spy(RecipeDTO.class);
+        recipeDTO2Spy.setId(id2);
+        recipesDTOSpy.add(recipeDTO2Spy);
 
         //when
-        when(recipeService.findAll()).thenReturn(recipesMockToReturn);
-
+        when(recipeService.findAll()).thenReturn(recipesSpy);
+        when(recipeConverterToDTO.convertCollection(anyCollection())).thenReturn(recipesDTOSpy);
         //then
         String returnedUrlPath = recipeController.findAll(model);
         assertEquals("/recipe/index", returnedUrlPath);
 
-        ArgumentCaptor<Set<Recipe>> argumentCaptor = ArgumentCaptor.forClass(Set.class);
+        ArgumentCaptor<Set<RecipeDTO>> argumentCaptor = ArgumentCaptor.forClass(Set.class);
 
         verify(recipeService, times(1)).findAll();
         verify(model, times(1)).addAttribute(eq("recipes"), argumentCaptor.capture());
@@ -83,13 +93,17 @@ class RecipeControllerTest {
     @Test
     void findByIdWhenFound() {
         //given
-        Recipe recipe1 = new Recipe(1L);
+        Long id  = 1L;
+        Recipe recipeSpy = spy(Recipe.class);
+        recipeSpy.setId(id);
+        RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
+        recipeDTOSpy.setId(id);
 
         //when
-        Long id  = 1L;
-        when(recipeService.findById(anyLong())).thenReturn(recipe1);
+        when(recipeService.findById(id)).thenReturn(recipeSpy);
+        when(recipeConverterToDTO.convert(recipeSpy)).thenReturn(recipeDTOSpy);
         String returnedView = recipeController.findById(model, id);
-        ArgumentCaptor<Recipe> recipeArgumentCaptor = ArgumentCaptor.forClass(Recipe.class);
+        ArgumentCaptor<RecipeDTO> recipeArgumentCaptor = ArgumentCaptor.forClass(RecipeDTO.class);
 
         verify(recipeService, times(1)).findById(anyLong());
         verify(model, times(1)).addAttribute(eq("recipe"), recipeArgumentCaptor.capture());
@@ -102,9 +116,11 @@ class RecipeControllerTest {
     @Test
     void findByIdWhenDoesNotFound() {
         //given
+        RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
 
         //when
         when(recipeService.findById(anyLong())).thenReturn(null);
+        when(recipeConverterToDTO.convert(null)).thenReturn(recipeDTOSpy);
         String returnedView = recipeController.findById(model, anyLong());
         ArgumentCaptor<Recipe> recipeArgumentCaptor = ArgumentCaptor.forClass(Recipe.class);
 
@@ -112,29 +128,42 @@ class RecipeControllerTest {
         verify(model, times(1)).addAttribute(eq("recipe"), recipeArgumentCaptor.capture());
 
         //then
-        assertNull(recipeArgumentCaptor.getValue());
+        assertEquals(recipeDTOSpy, recipeArgumentCaptor.getValue());
         assertEquals("/recipe/detailed_recipe", returnedView);
     }
 
     @Test
     void findByIdWebMvcWhenFound() throws Exception {
-        Recipe recipe1 = new Recipe(1L);
+        //given
+        Long id = 1L;
+        final Recipe recipeSpy = spy(Recipe.class);
+        recipeSpy.setId(id);
+        final RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
+        recipeDTOSpy.setId(id);
 
-        when(recipeService.findById(anyLong())).thenReturn(recipe1);
+        //when
+        when(recipeService.findById(anyLong())).thenReturn(recipeSpy);
+        when(recipeConverterToDTO.convert(recipeSpy)).thenReturn(recipeDTOSpy);
 
+        //then
         mockMvc.perform(get("/recipe/findById/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/recipe/detailed_recipe"))
-                .andExpect(model().attribute("recipe", recipe1));
+                .andExpect(model().attribute("recipe", recipeDTOSpy));
     }
     @Test
     void findByIdWebMvcWhenDoesNotFound() throws Exception {
+        //given
+        final RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
 
+        //when
         when(recipeService.findById(anyLong())).thenReturn(null);
+        when(recipeConverterToDTO.convert(null)).thenReturn(recipeDTOSpy);
 
+        //then
         mockMvc.perform(get("/recipe/findById/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/recipe/detailed_recipe"))
-                .andExpect(model().attribute("recipe", IsNull.nullValue()));
+                .andExpect(model().attribute("recipe", recipeDTOSpy));
     }
 }

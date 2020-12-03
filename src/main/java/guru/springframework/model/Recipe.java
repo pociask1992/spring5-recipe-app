@@ -59,6 +59,11 @@ public class Recipe {
         ingredients.addAll(ingredientsToSave);
     }
 
+    public void addIngredient(Ingredient ingredientToAdd) {
+        ingredientToAdd.setRecipe(this);
+        ingredients.add(ingredientToAdd);
+    }
+
     public void addCategories(Set<Category> categoryToAdd) {
         categoryToAdd.forEach(category -> {
             category.addRecipe(this);

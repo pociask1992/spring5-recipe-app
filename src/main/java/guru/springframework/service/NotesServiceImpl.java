@@ -16,6 +16,11 @@ public class NotesServiceImpl implements NotesService {
     }
 
     @Override
+    public Notes save(Notes notes) {
+        return notesRepository.save(notes);
+    }
+
+    @Override
     public Optional<Notes> findById(Long notesID) {
         return notesRepository.findById(notesID);
     }

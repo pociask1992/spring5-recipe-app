@@ -7,6 +7,8 @@ import guru.springframework.service.RecipeService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,6 +34,12 @@ public class CategoryConverterFromDTO implements Converter<CategoryDTO, Category
                 toReturn.setRecipes(recipes);
             }
         }
+        return toReturn;
+    }
+
+    public Set<Category> convertCollection(Collection<CategoryDTO> toConvert) {
+        Set<Category> toReturn = new HashSet<>();
+        toConvert.forEach(elem -> toReturn.add(convert(elem)));
         return toReturn;
     }
 }

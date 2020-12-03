@@ -11,6 +11,6 @@ public interface RecipeService {
     Recipe findById(Long recipeId);
     Set<Recipe> findByIds(Collection<Long> ids);
     byte[] readImageByName(String imageName);
-    void save(Recipe recipeToSave);
+    Recipe save(Recipe recipeToSave);
     Iterable<Recipe> save(Set<Recipe> recipesToSave);
 }

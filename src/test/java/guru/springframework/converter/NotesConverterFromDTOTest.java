@@ -4,13 +4,12 @@ import guru.springframework.dto.NotesDTO;
 import guru.springframework.model.Notes;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -18,6 +17,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class NotesConverterFromDTOTest {
 
     @Mock
@@ -30,17 +30,6 @@ class NotesConverterFromDTOTest {
     private final Long ID = 5L;
     private final Long RECIPE_ID = 700L;
     private final String RECIPE_NOTES = "recipe notes";
-
-    private AutoCloseable autoCloseable;
-    @BeforeEach
-    void openMock() {
-        autoCloseable = MockitoAnnotations.openMocks(this  );
-    }
-
-    @AfterEach
-    void releaseMock() throws Exception {
-        autoCloseable.close();
-    }
 
     @Test
     void convertWhenRecipeNotNull() {
@@ -69,7 +58,6 @@ class NotesConverterFromDTOTest {
         notesDTO.setRecipeNotes(RECIPE_NOTES);
 
         //when
-        when(recipeService.findById(anyLong())).thenReturn(null);
         final Notes returnedNotes = notesConverterFromDTO.convert(notesDTO);
 
         //then

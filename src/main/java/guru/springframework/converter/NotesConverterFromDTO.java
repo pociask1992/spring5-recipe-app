@@ -27,7 +27,7 @@ public class NotesConverterFromDTO implements Converter<NotesDTO, Notes> {
             Long recipeId = notesDTO.getRecipeId();
             if(Optional.ofNullable(recipeId).isPresent()) {
                 final Recipe foundRecipe = recipeService.findById(recipeId);
-                toReturn.setRecipe(foundRecipe);
+                foundRecipe.addNotes(toReturn);
             }
         }
         return toReturn;

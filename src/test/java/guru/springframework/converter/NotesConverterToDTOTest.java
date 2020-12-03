@@ -3,17 +3,17 @@ package guru.springframework.converter;
 import guru.springframework.dto.NotesDTO;
 import guru.springframework.model.Notes;
 import guru.springframework.model.Recipe;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.spy;
 
+@ExtendWith(MockitoExtension.class)
 class NotesConverterToDTOTest {
 
     @Spy
@@ -24,17 +24,6 @@ class NotesConverterToDTOTest {
     private final Long ID = 123L;
     private final String RECIPE_NOTES = "recipe notes";
     private final Long RECIPE_ID = 111L;
-
-    private AutoCloseable autoCloseable;
-    @BeforeEach
-    void openMock() {
-        autoCloseable = MockitoAnnotations.openMocks(this  );
-    }
-
-    @AfterEach
-    void releaseMock() throws Exception {
-        autoCloseable.close();
-    }
 
     @Test
     void convertWhenRecipeNotNull() {

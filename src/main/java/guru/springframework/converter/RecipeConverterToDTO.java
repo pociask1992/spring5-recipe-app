@@ -54,7 +54,7 @@ public class RecipeConverterToDTO implements Converter<Recipe, RecipeDTO> {
         return toReturn;
     }
 
-    public Set<RecipeDTO> convert(Collection<Recipe> toConvert) {
+    public Set<RecipeDTO> convertCollection(Collection<Recipe> toConvert) {
         Set<RecipeDTO> toReturn = new HashSet<>();
         if(Optional.ofNullable(toConvert).isPresent() &&
                 !toConvert.isEmpty()) {

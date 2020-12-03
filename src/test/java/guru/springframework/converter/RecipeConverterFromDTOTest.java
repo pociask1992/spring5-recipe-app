@@ -5,34 +5,30 @@ import guru.springframework.dto.IngredientDTO;
 import guru.springframework.dto.NotesDTO;
 import guru.springframework.dto.RecipeDTO;
 import guru.springframework.model.*;
-import guru.springframework.service.CategoryService;
-import guru.springframework.service.IngredientService;
-import guru.springframework.service.NotesService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class RecipeConverterFromDTOTest {
     @Mock
-    private NotesService notesService;
+    private NotesConverterFromDTO notesConverterFromDTO;
     @Mock
-    private IngredientService ingredientService;
+    private CategoryConverterFromDTO categoryConverterFromDTO;
     @Mock
-    private CategoryService categoryService;
+    private IngredientConverterFromDTO ingredientConverterFromDTO;
     @Spy
     private RecipeDTO recipeDTOSpy;
     @InjectMocks
@@ -52,17 +48,6 @@ class RecipeConverterFromDTOTest {
     private final Long NOTES_ID = 5L;
     private final Set<Long> INGREDIENTS_SET = new HashSet<>(Set.of(100L, 300L, 400L));
     private final Set<Long> CATEGORY_SET = new HashSet<>(Set.of(11L, 22L, 33L));
-
-    private AutoCloseable autoCloseable;
-    @BeforeEach
-    void openMock() {
-        autoCloseable = MockitoAnnotations.openMocks(this  );
-    }
-
-    @AfterEach
-    void releaseMock() throws Exception {
-        autoCloseable.close();
-    }
 
     @Test
     void convertWhenObjectsNotNull() {
@@ -120,9 +105,9 @@ class RecipeConverterFromDTOTest {
         });
 
         //when
-        when(ingredientService.findByIds(INGREDIENTS_SET)).thenReturn(ingredients);
-        when(categoryService.findByIds(CATEGORY_SET)).thenReturn(categories);
-        when(notesService.findById(anyLong())).thenReturn(Optional.of(notesSpy));
+        when(ingredientConverterFromDTO.convertCollection(anyCollection())).thenReturn(ingredients);
+        when(categoryConverterFromDTO.convertCollection(anyCollection())).thenReturn(categories);
+        when(notesConverterFromDTO.convert(notesDTOSpy)).thenReturn(notesSpy);
         final Recipe returnedRecipe = recipeConverterFromDTO.convert(recipeDTOSpy);
 
         //then
@@ -160,9 +145,6 @@ class RecipeConverterFromDTOTest {
         recipeDTOSpy.setBase64Image(BASE64_IMAGE);
 
         //when
-        when(ingredientService.findByIds(INGREDIENTS_SET)).thenReturn(null);
-        when(categoryService.findByIds(CATEGORY_SET)).thenReturn(null);
-        when(notesService.findById(anyLong())).thenReturn(Optional.empty());
         final Recipe returnedRecipe = recipeConverterFromDTO.convert(recipeDTOSpy);
 
         //then

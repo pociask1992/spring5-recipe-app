@@ -2,6 +2,7 @@ package guru.springframework.dto;
 
 import guru.springframework.model.Difficulty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -29,4 +30,9 @@ public class RecipeDTO {
     private String base64Image;
     private NotesDTO notesDTO;
     private Set<CategoryDTO> categoriesDTO = new HashSet<>();
+
+    @Builder
+    public RecipeDTO(Long id) {
+        this.id = id;
+    }
 }

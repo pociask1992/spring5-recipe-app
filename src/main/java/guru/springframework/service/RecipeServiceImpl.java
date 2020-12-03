@@ -94,9 +94,9 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public void save(Recipe recipeToSave) {
+    public Recipe save(Recipe recipeToSave) {
         log.debug("RecipeServiceImpl.save");
-        recipeRepository.save(recipeToSave);
+        return recipeRepository.save(recipeToSave);
     }
 
     @Override

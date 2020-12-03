@@ -8,7 +8,10 @@ import guru.springframework.service.RecipeService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class IngredientConverterFromDTO  implements Converter<IngredientDTO, Ingredient> {
@@ -30,11 +33,21 @@ public class IngredientConverterFromDTO  implements Converter<IngredientDTO, Ing
             toReturn.setDescription(ingredientDTO.getDescription());
             toReturn.setAmount(ingredientDTO.getAmount());
             final Long recipeId = ingredientDTO.getRecipeId();
-            final Recipe returnedRecipe = recipeService.findById(recipeId);
-            toReturn.setRecipe(returnedRecipe);
+            if(Optional.ofNullable(recipeId).isPresent()) {
+                final Recipe returnedRecipe = recipeService.findById(recipeId);
+                if(Optional.ofNullable(returnedRecipe).isPresent()) {
+                    returnedRecipe.addIngredient(toReturn);
+                }
+            }
             final UnitOfMeasureDTO unitOfMeasureDTO = ingredientDTO.getUnitOfMeasureDTO();
             toReturn.setUnitOfMeasure(unitOfMeasureConverterFromDTO.convert(unitOfMeasureDTO));
         }
+        return toReturn;
+    }
+
+    public Set<Ingredient> convertCollection(Collection<IngredientDTO> toConvert) {
+        Set<Ingredient> toReturn = new HashSet<>();
+        toConvert.forEach(elem -> toReturn.add(convert(elem)));
         return toReturn;
     }
 }

@@ -4,15 +4,12 @@ import guru.springframework.dto.CategoryDTO;
 import guru.springframework.model.Category;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class CategoryConverterFromDTOTest {
 
     @Mock
@@ -36,17 +33,6 @@ class CategoryConverterFromDTOTest {
     private final Long ID = 1L;
     private final String DESCRIPTION = "description";
     private final Set<Long> IDS = new HashSet<>(Set.of(1L, 2L, 3L));
-
-    private AutoCloseable autoCloseable;
-    @BeforeEach
-    void openMock() {
-        autoCloseable = MockitoAnnotations.openMocks(this  );
-    }
-
-    @AfterEach
-    void releaseMock() throws Exception {
-        autoCloseable.close();
-    }
 
     @Test
     void convertWhenNotNull() {
