@@ -35,12 +35,20 @@ public class RecipeController {
         return "/recipe/index";
     }
 
-    @GetMapping("/findById/{id}")
+    @GetMapping("/{id}/show")
     public String findById(Model model, @PathVariable("id") Long recipeId) {
         final Recipe foundRecipe = recipeService.findById(recipeId);
         final RecipeDTO convertedRecipe = recipeConverterToDTO.convert(foundRecipe);
         model.addAttribute("recipe", convertedRecipe);
         return "/recipe/detailed_recipe";
+    }
+
+    @GetMapping("/{id}/update")
+    public String update(Model model, @PathVariable("id") Long recipeId) {
+        final Recipe foundRecipe = recipeService.findById(recipeId);
+        final RecipeDTO convertedRecipe = recipeConverterToDTO.convert(foundRecipe);
+        model.addAttribute("recipe", convertedRecipe);
+        return "/recipe/recipe_form";
     }
 
     @GetMapping("/new")
@@ -50,10 +58,10 @@ public class RecipeController {
     }
 
     @PostMapping
-    @RequestMapping(name = "recipe")
     public String saveOrUpdateRecipe(@ModelAttribute RecipeDTO recipeDTO) {
-        final Recipe savedRecipe = recipeService.save(recipeConverterFromDTO.convert(recipeDTO));
+        final Recipe convertRecipe = recipeConverterFromDTO.convert(recipeDTO);
+        final Recipe savedRecipe = recipeService.save(convertRecipe);
 
-        return String.format("redirect:findById/%d", savedRecipe.getId());
+        return String.format("redirect:/recipe/%d/show", savedRecipe.getId());
     }
 }

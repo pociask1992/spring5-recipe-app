@@ -19,9 +19,11 @@ import org.springframework.ui.Model;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith({MockitoExtension.class})
@@ -93,7 +95,7 @@ class RecipeControllerTest {
     @Test
     void findByIdWhenFound() {
         //given
-        Long id  = 1L;
+        Long id = 1L;
         Recipe recipeSpy = spy(Recipe.class);
         recipeSpy.setId(id);
         RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
@@ -146,13 +148,14 @@ class RecipeControllerTest {
         when(recipeConverterToDTO.convert(recipeSpy)).thenReturn(recipeDTOSpy);
 
         //then
-        mockMvc.perform(get("/recipe/findById/{id}", 1))
+        mockMvc.perform(get("/recipe/{id}/show", 1))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/recipe/detailed_recipe"))
                 .andExpect(model().attribute("recipe", recipeDTOSpy));
     }
+
     @Test
-    void findByIdWebMvcWhenDoesNotFound() throws Exception {
+    void findByIdWebMvcWhenDoesNotFind() throws Exception {
         //given
         final RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
 
@@ -161,9 +164,76 @@ class RecipeControllerTest {
         when(recipeConverterToDTO.convert(null)).thenReturn(recipeDTOSpy);
 
         //then
-        mockMvc.perform(get("/recipe/findById/{id}", 1))
+        mockMvc.perform(get("/recipe/{id}/show", 1))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/recipe/detailed_recipe"))
                 .andExpect(model().attribute("recipe", recipeDTOSpy));
+    }
+
+    @Test
+    void updateWebMvcWhenFound() throws Exception {
+        //given
+        Long id = 1L;
+        final Recipe recipeSpy = spy(Recipe.class);
+        recipeSpy.setId(id);
+        final RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
+        recipeDTOSpy.setId(id);
+
+        //when
+        when(recipeService.findById(anyLong())).thenReturn(recipeSpy);
+        when(recipeConverterToDTO.convert(recipeSpy)).thenReturn(recipeDTOSpy);
+
+        //then
+        mockMvc.perform(get("/recipe/{id}/update", 1))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/recipe/recipe_form"))
+                .andExpect(model().attribute("recipe", recipeDTOSpy));
+    }
+
+    @Test
+    void updateWebMvcWhenDoesNotFind() throws Exception {
+        //given
+        final RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
+
+        //when
+        when(recipeService.findById(anyLong())).thenReturn(null);
+        when(recipeConverterToDTO.convert(null)).thenReturn(recipeDTOSpy);
+
+        //then
+        mockMvc.perform(get("/recipe/{id}/update", 1))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/recipe/recipe_form"))
+                .andExpect(model().attribute("recipe", recipeDTOSpy));
+    }
+
+    @Test
+    void showNewRecipeForm() throws Exception {
+        mockMvc.perform(get("/recipe/new"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("recipe/recipe_form"))
+                .andExpect(model().attribute("recipe", isA(RecipeDTO.class)));
+    }
+
+    @Test
+    void saveOrUpdateRecipe() throws Exception {
+        //given
+        Long recipeId = 100L;
+        final RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
+        recipeDTOSpy.setId(recipeId);
+
+        final Recipe convertedRecipeSpy = spy(Recipe.class);
+        convertedRecipeSpy.setId(recipeId);
+
+        final Recipe savedRecipeSpy = spy(Recipe.class);
+        savedRecipeSpy.setId(recipeId);
+
+        //when
+        when(recipeConverterFromDTO.convert(any())).thenReturn(convertedRecipeSpy);
+        when(recipeService.save(convertedRecipeSpy)).thenReturn(savedRecipeSpy);
+
+        //then
+        mockMvc.perform(post("/recipe", recipeDTOSpy))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl(String.format("/recipe/%d/show", recipeId)));
     }
 }
