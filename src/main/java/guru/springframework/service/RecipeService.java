@@ -8,9 +8,11 @@ import java.util.Set;
 public interface RecipeService {
 
     Set<Recipe> findAll();
+    Set<Recipe> findAllOrderByDescriptionDescAndIdAsc();
     Recipe findById(Long recipeId);
     Set<Recipe> findByIds(Collection<Long> ids);
     byte[] readImageByName(String imageName);
     Recipe save(Recipe recipeToSave);
     Iterable<Recipe> save(Set<Recipe> recipesToSave);
+    void deleteById(Long id);
 }

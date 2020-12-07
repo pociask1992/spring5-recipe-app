@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -38,6 +35,14 @@ public class RecipeServiceImpl implements RecipeService {
         if (Optional.ofNullable(allRecipes).isPresent()) {
             allRecipes.spliterator().forEachRemaining(toReturn::add);
         }
+        return toReturn;
+    }
+
+    @Override
+    public Set<Recipe> findAllOrderByDescriptionDescAndIdAsc() {
+        Set<Recipe> toReturn = new LinkedHashSet<>();
+        final Iterable<Recipe> recipes = recipeRepository.findAllByOrderByDescriptionDescIdAsc();
+        recipes.spliterator().forEachRemaining(toReturn::add);
         return toReturn;
     }
 
@@ -103,5 +108,11 @@ public class RecipeServiceImpl implements RecipeService {
     public Iterable<Recipe> save(Set<Recipe> recipesToSave) {
         log.debug("RecipeServiceImpl.save");
         return recipeRepository.saveAll(recipesToSave);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        log.debug("RecipeServiceImpl.deleteById");
+        recipeRepository.deleteById(id);
     }
 }

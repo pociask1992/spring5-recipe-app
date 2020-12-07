@@ -79,7 +79,7 @@ class RecipeControllerTest {
         recipesDTOSpy.add(recipeDTO2Spy);
 
         //when
-        when(recipeService.findAll()).thenReturn(recipesSpy);
+        when(recipeService.findAllOrderByDescriptionDescAndIdAsc()).thenReturn(recipesSpy);
         when(recipeConverterToDTO.convertCollection(anyCollection())).thenReturn(recipesDTOSpy);
         //then
         String returnedUrlPath = recipeController.findAll(model);
@@ -87,7 +87,7 @@ class RecipeControllerTest {
 
         ArgumentCaptor<Set<RecipeDTO>> argumentCaptor = ArgumentCaptor.forClass(Set.class);
 
-        verify(recipeService, times(1)).findAll();
+        verify(recipeService, times(1)).findAllOrderByDescriptionDescAndIdAsc();
         verify(model, times(1)).addAttribute(eq("recipes"), argumentCaptor.capture());
         assertEquals(2, argumentCaptor.getValue().size());
     }
@@ -235,5 +235,19 @@ class RecipeControllerTest {
         mockMvc.perform(post("/recipe", recipeDTOSpy))
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl(String.format("/recipe/%d/show", recipeId)));
+    }
+
+    @Test
+    void deleteById() throws Exception {
+        //given
+        Long id = 1L;
+        //when
+        //then
+
+        mockMvc.perform(get(String.format("/recipe/%d/delete", id)))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/recipe/"));
+
+        verify(recipeService, times(1)).deleteById(anyLong());
     }
 }

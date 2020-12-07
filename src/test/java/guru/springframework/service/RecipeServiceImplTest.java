@@ -15,8 +15,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class RecipeServiceImplTest {
 
@@ -75,5 +74,16 @@ class RecipeServiceImplTest {
 
         //then
         assertTrue(returnedRecipes.isEmpty());
+    }
+
+    @Test
+    void deleteById() {
+        //given
+        Long id = 100L;
+
+        //when
+        //then
+        recipeService.deleteById(id);
+        verify(recipeRepository, times(1)).deleteById(id);
     }
 }

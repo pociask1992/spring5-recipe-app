@@ -29,7 +29,7 @@ public class RecipeController {
 
     @GetMapping({"", "/", "index", "index.html"})
     public String findAll(Model model) {
-        final Set<Recipe> recipes = recipeService.findAll();
+        final Set<Recipe> recipes = recipeService.findAllOrderByDescriptionDescAndIdAsc();
         final Set<RecipeDTO> convertedRecipes = recipeConverterToDTO.convertCollection(recipes);
         model.addAttribute("recipes", convertedRecipes);
         return "/recipe/index";
@@ -63,5 +63,12 @@ public class RecipeController {
         final Recipe savedRecipe = recipeService.save(convertRecipe);
 
         return String.format("redirect:/recipe/%d/show", savedRecipe.getId());
+    }
+
+    @GetMapping("/{id}/delete")
+    public String deleteById(@PathVariable Long id) {
+        recipeService.deleteById(id);
+
+        return "redirect:/recipe/";
     }
 }
