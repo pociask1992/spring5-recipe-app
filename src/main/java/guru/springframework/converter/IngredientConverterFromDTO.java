@@ -5,6 +5,7 @@ import guru.springframework.dto.UnitOfMeasureDTO;
 import guru.springframework.model.Ingredient;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
+import guru.springframework.service.UnitOfMeasureService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +18,12 @@ import java.util.Set;
 public class IngredientConverterFromDTO  implements Converter<IngredientDTO, Ingredient> {
 
     private final RecipeService recipeService;
-    private final UnitOfMeasureConverterFromDTO unitOfMeasureConverterFromDTO;
+    private final UnitOfMeasureService unitOfMeasureService;
 
     public IngredientConverterFromDTO(RecipeService recipeService,
-                                      UnitOfMeasureConverterFromDTO unitOfMeasureConverterFromDTO) {
+                                      UnitOfMeasureService unitOfMeasureService) {
         this.recipeService = recipeService;
-        this.unitOfMeasureConverterFromDTO = unitOfMeasureConverterFromDTO;
+        this.unitOfMeasureService = unitOfMeasureService;
     }
 
     @Override
@@ -40,7 +41,9 @@ public class IngredientConverterFromDTO  implements Converter<IngredientDTO, Ing
                 }
             }
             final UnitOfMeasureDTO unitOfMeasureDTO = ingredientDTO.getUnitOfMeasureDTO();
-            toReturn.setUnitOfMeasure(unitOfMeasureConverterFromDTO.convert(unitOfMeasureDTO));
+            if(Optional.ofNullable(unitOfMeasureDTO).isPresent() && Optional.ofNullable(unitOfMeasureDTO.getId()).isPresent()) {
+                toReturn.setUnitOfMeasure(unitOfMeasureService.findById(unitOfMeasureDTO.getId()).orElse(null));
+            }
         }
         return toReturn;
     }

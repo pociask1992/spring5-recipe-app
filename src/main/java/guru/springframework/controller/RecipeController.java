@@ -41,7 +41,7 @@ public class RecipeController {
         final RecipeDTO convertedRecipe = recipeConverterToDTO.convert(foundRecipe);
         model.addAttribute("recipe", convertedRecipe);
         return "/recipe/detailed_recipe";
-    }
+}
 
     @GetMapping("/{id}/update")
     public String update(Model model, @PathVariable("id") Long recipeId) {

@@ -15,6 +15,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -60,7 +61,7 @@ class IngredientConverterFromDTOTest {
 
         //when
         when(recipeService.findById(RECIPE_ID)).thenReturn(spyRecipe);
-        when(unitOfMeasureConverterFromDTO.convert(unitOfMeasureDTOSpy)).thenReturn(unitOfMeasureSpy);
+        when(unitOfMeasureService.findById(UNIT_OF_MEASURE_ID)).thenReturn(Optional.of(unitOfMeasureSpy));
         final Ingredient returnedIngredient = ingredientConverterFromDTO.convert(ingredientDTO);
 
         //then
@@ -80,10 +81,7 @@ class IngredientConverterFromDTOTest {
         ingredientDTO.setRecipeId(null);
         ingredientDTO.setUnitOfMeasureDTO(null);
 
-        final UnitOfMeasure unitOfMeasure = spy(UnitOfMeasure.class);
-
         //when
-        when(unitOfMeasureConverterFromDTO.convert(null)).thenReturn(unitOfMeasure);
         final Ingredient returnedIngredient = ingredientConverterFromDTO.convert(ingredientDTO);
 
         //then
@@ -91,6 +89,6 @@ class IngredientConverterFromDTOTest {
         assertEquals(DESCRIPTION, returnedIngredient.getDescription());
         assertEquals(AMOUNT, returnedIngredient.getAmount());
         assertNull(returnedIngredient.getRecipe());
-        assertEquals(unitOfMeasure, returnedIngredient.getUnitOfMeasure());
+        assertEquals(null, returnedIngredient.getUnitOfMeasure());
     }
 }

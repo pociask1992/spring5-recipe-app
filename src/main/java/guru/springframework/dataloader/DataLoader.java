@@ -59,7 +59,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         guacamole.setServings(10);
         guacamole.setSource("https://www.simplyrecipes.com/");
         guacamole.setUrl("https://www.simplyrecipes.com/recipes/perfect_guacamole/");
-        guacamole.setImages(readGuacamoleImage("1"));
+//        guacamole.setImages(readGuacamoleImage("1"));
         guacamole.addNotes(getGuacamoleNotes());
         assignCategoryToGuacamole(guacamole);
         assignIngredientsToGuacamole(guacamole);

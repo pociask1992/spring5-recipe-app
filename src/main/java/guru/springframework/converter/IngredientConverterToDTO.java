@@ -7,10 +7,7 @@ import guru.springframework.model.UnitOfMeasure;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class IngredientConverterToDTO implements Converter<Ingredient, IngredientDTO> {
@@ -43,6 +40,14 @@ public class IngredientConverterToDTO implements Converter<Ingredient, Ingredien
     public Set<IngredientDTO> convert(Collection<Ingredient> toConvert) {
         Set<IngredientDTO> toReturn = new HashSet<>();
         toConvert.forEach(elemToConvert -> {
+            toReturn.add(convert(elemToConvert));
+        });
+        return toReturn;
+    }
+
+    public Set<IngredientDTO> convertIterable(Iterable<Ingredient> toConvert) {
+        Set<IngredientDTO> toReturn = new LinkedHashSet<>();
+        toConvert.spliterator().forEachRemaining(elemToConvert -> {
             toReturn.add(convert(elemToConvert));
         });
         return toReturn;

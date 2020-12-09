@@ -1,5 +1,7 @@
 package guru.springframework.service;
 
+import guru.springframework.converter.UnitOfMeasureConverterToDTO;
+import guru.springframework.dto.UnitOfMeasureDTO;
 import guru.springframework.model.UnitOfMeasure;
 import guru.springframework.repository.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -14,19 +16,22 @@ import java.util.Set;
 public class UnitOfMeasureImpl implements UnitOfMeasureService {
 
     private final UnitOfMeasureRepository unitOfMeasureRepository;
+    private final UnitOfMeasureConverterToDTO unitOfMeasureConverterToDTO;
 
-    public UnitOfMeasureImpl(UnitOfMeasureRepository unitOfMeasureRepository) {
+    public UnitOfMeasureImpl(UnitOfMeasureRepository unitOfMeasureRepository,
+                             UnitOfMeasureConverterToDTO unitOfMeasureConverterToDTO) {
         this.unitOfMeasureRepository = unitOfMeasureRepository;
+        this.unitOfMeasureConverterToDTO = unitOfMeasureConverterToDTO;
     }
 
     @Override
-    public Set<UnitOfMeasure> findAll() {
+    public Set<UnitOfMeasureDTO> findAll() {
         log.debug("Invoking UnitOfMeasureImpl.findAll");
         final Iterable<UnitOfMeasure> foundUnitsOfMeasure = unitOfMeasureRepository.findAll();
 
         Set<UnitOfMeasure> unitOfMeasureSet = new HashSet<>();
         foundUnitsOfMeasure.iterator().forEachRemaining(unitOfMeasureSet::add);
-        return unitOfMeasureSet;
+        return unitOfMeasureConverterToDTO.convertCollection(unitOfMeasureSet);
     }
 
     @Override
