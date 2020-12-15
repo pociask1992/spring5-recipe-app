@@ -21,7 +21,7 @@ public class Ingredient {
     private BigDecimal amount;
     @OneToOne
     private UnitOfMeasure unitOfMeasure;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE})
     private Recipe recipe;
 
 }

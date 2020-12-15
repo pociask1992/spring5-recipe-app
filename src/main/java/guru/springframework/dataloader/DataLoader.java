@@ -73,10 +73,9 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     }
     private void assignCategoryToGuacamole(Recipe recipe) {
         log.info("DataLoader.assignCategoryToGuacamole");
-        final Category hotDish = categoryService.findByDescription("Hot Dish");
+        final Category hotDish = categoryService.findByDescription("Hot dish");
         if(Optional.ofNullable(hotDish).isPresent()) {
-            Set<Category> categories = Set.of(hotDish);
-            recipe.addCategories(categories);
+            recipe.addCategory(hotDish);
         }
     }
 

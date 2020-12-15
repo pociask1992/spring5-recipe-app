@@ -69,10 +69,11 @@ public class Recipe {
         ingredients.remove(ingredientToDelete);
     }
 
-    public void addCategories(Set<Category> categoryToAdd) {
-        categoryToAdd.forEach(category -> {
-            category.addRecipe(this);
-        });
-        categories.addAll(categoryToAdd);
+    public void addCategories(Set<Category> categoriesToAdd) {
+        categories.addAll(categoriesToAdd);
+    }
+
+    public void addCategory(Category categoryToAdd) {
+        categories.add(categoryToAdd);
     }
 }
