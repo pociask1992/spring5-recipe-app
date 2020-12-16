@@ -43,8 +43,7 @@ class RecipeConverterFromDTOTest {
     private final String URL = "recpe url";
     private final String DIRECTIONS = "recipe directions";
     private final Difficulty DIFFICULTY = Difficulty.EASY;
-    private final byte[] IMAGE = new byte[5];
-    private final String BASE64_IMAGE = "base64 image";
+    private final Byte[] IMAGE = new Byte[5];
     private final Long NOTES_ID = 5L;
     private final Set<Long> INGREDIENTS_SET = new HashSet<>(Set.of(100L, 300L, 400L));
     private final Set<Long> CATEGORY_SET = new HashSet<>(Set.of(11L, 22L, 33L));
@@ -62,7 +61,6 @@ class RecipeConverterFromDTOTest {
         recipeDTOSpy.setDirections(DIRECTIONS);
         recipeDTOSpy.setDifficulty(DIFFICULTY);
         recipeDTOSpy.setImages(IMAGE);
-        recipeDTOSpy.setBase64Image(BASE64_IMAGE);
         final NotesDTO notesDTOSpy = spy(NotesDTO.class);
         notesDTOSpy.setId(NOTES_ID);
         recipeDTOSpy.setNotesDTO(notesDTOSpy);
@@ -121,7 +119,6 @@ class RecipeConverterFromDTOTest {
         assertEquals(DIRECTIONS, returnedRecipe.getDirections());
         assertEquals(DIFFICULTY, returnedRecipe.getDifficulty());
         assertEquals(IMAGE, returnedRecipe.getImages());
-        assertEquals(BASE64_IMAGE, returnedRecipe.getBase64Image());
         assertEquals(NOTES_ID, returnedRecipe.getNotes().getId());
         assertEquals(INGREDIENTS_SET.size(), returnedRecipe.getIngredients().size());
         assertEquals(INGREDIENTS_SET, returnedRecipe.getIngredients().stream().map(Ingredient::getId).collect(Collectors.toSet()));
@@ -142,7 +139,6 @@ class RecipeConverterFromDTOTest {
         recipeDTOSpy.setDirections(DIRECTIONS);
         recipeDTOSpy.setDifficulty(DIFFICULTY);
         recipeDTOSpy.setImages(IMAGE);
-        recipeDTOSpy.setBase64Image(BASE64_IMAGE);
 
         //when
         final Recipe returnedRecipe = recipeConverterFromDTO.convert(recipeDTOSpy);
@@ -158,7 +154,6 @@ class RecipeConverterFromDTOTest {
         assertEquals(DIRECTIONS, returnedRecipe.getDirections());
         assertEquals(DIFFICULTY, returnedRecipe.getDifficulty());
         assertEquals(IMAGE, returnedRecipe.getImages());
-        assertEquals(BASE64_IMAGE, returnedRecipe.getBase64Image());
         assertNull(returnedRecipe.getNotes());
         assertTrue(returnedRecipe.getIngredients().isEmpty());
         assertTrue(returnedRecipe.getCategories().isEmpty());

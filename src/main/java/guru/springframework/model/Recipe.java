@@ -30,8 +30,7 @@ public class Recipe {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
     private Set<Ingredient> ingredients = new HashSet<>();
     @Lob
-    private byte[] images;
-    private String base64Image;
+    private Byte[] images;
     @OneToOne(cascade = CascadeType.ALL)
     private Notes notes;
     @ManyToMany

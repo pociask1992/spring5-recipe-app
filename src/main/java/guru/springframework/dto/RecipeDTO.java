@@ -26,8 +26,7 @@ public class RecipeDTO {
     private String directions;
     private Difficulty difficulty;
     private Set<IngredientDTO> ingredientsDTO = new HashSet<>();
-    private byte[] images;
-    private String base64Image;
+    private Byte[] images;
     private NotesDTO notesDTO;
     private Set<CategoryDTO> categoriesDTO = new HashSet<>();
 

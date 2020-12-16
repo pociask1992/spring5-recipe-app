@@ -3,15 +3,10 @@ package guru.springframework.service;
 import guru.springframework.model.Recipe;
 import guru.springframework.repository.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 
 @Slf4j
@@ -51,8 +46,7 @@ public class RecipeServiceImpl implements RecipeService {
         log.debug(String.format("Invoking RecipeServiceImpl.findById(%d)", recipeId));
         Optional<Recipe> toReturn;
         if (Optional.ofNullable(recipeId).isPresent()) {
-            toReturn = recipeRepository.findById(recipeId);
-            toReturn.ifPresent(recipe -> recipe.setBase64Image(Base64.encodeBase64String(recipe.getImages())));
+            toReturn = recipeRepository.findById(recipeId);;
         } else {
             throw new RuntimeException("RecipeServiceImpl.findById recipeId cannot be null.");
         }
@@ -67,35 +61,6 @@ public class RecipeServiceImpl implements RecipeService {
             foundIds.forEach(toReturn::add);
         }
         return toReturn;
-    }
-
-    private void saveImage(Recipe recipe) {
-        log.debug("Invoking RecipeServiceImpl.saveImage");
-        if (Optional.ofNullable(recipe).isPresent()) {
-            final byte[] images = recipe.getImages();
-            if (Optional.ofNullable(images).isEmpty()) {
-                int recid = recipe.getId().intValue();
-                final byte[] readBytes = readImageByName(String.valueOf(recid));
-                if (Optional.ofNullable(readBytes).isPresent() && readBytes.length > 0) {
-                    recipe.setImages(readBytes);
-                    recipeRepository.save(recipe);
-                }
-            }
-        }
-    }
-
-    @Override
-    public byte[] readImageByName(String imageName) {
-        log.debug("Invoking RecipeServiceImpl.readImageByName");
-        final Resource resource = resourceLoader.getResource(String.format("classpath:fotos/%s.jpg", imageName));
-        byte[] readBytes = null;
-        try {
-            final File file = resource.getFile();
-            readBytes = Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return readBytes;
     }
 
     @Override

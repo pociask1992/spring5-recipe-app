@@ -44,7 +44,6 @@ public class RecipeConverterFromDTO implements Converter<RecipeDTO, Recipe> {
             toReturn.setDirections(recipeDTO.getDirections());
             toReturn.setDifficulty(recipeDTO.getDifficulty());
             toReturn.setImages(recipeDTO.getImages());
-            toReturn.setBase64Image(recipeDTO.getBase64Image());
             final NotesDTO notesDTO = recipeDTO.getNotesDTO();
             if (Optional.ofNullable(notesDTO).isPresent()) {
                 final Notes convertedNotes = notesConverterFromDTO.convert(notesDTO);

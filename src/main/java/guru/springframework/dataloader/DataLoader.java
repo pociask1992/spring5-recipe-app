@@ -67,10 +67,6 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         return guacamole;
     }
 
-
-    public byte[] readGuacamoleImage(String imageName) {
-        return recipeService.readImageByName(imageName);
-    }
     private void assignCategoryToGuacamole(Recipe recipe) {
         log.info("DataLoader.assignCategoryToGuacamole");
         final Category hotDish = categoryService.findByDescription("Hot dish");
