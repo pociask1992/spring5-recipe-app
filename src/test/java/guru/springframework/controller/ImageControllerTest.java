@@ -9,11 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -72,5 +74,32 @@ class ImageControllerTest {
         .andExpect(header().string("Location", String.format("/recipe/%d/show", id)));
 
         verify(imageServiceMock, times(1)).saveImageFile(anyLong(), any());
+    }
+
+    @Test
+    void renderImageFromDB() throws Exception {
+        //given
+        Long recipeId = 123L;
+        final Recipe recipeSpy = spy(Recipe.class);
+        recipeSpy.setId(recipeId);
+        String s = "ala ma kota";
+        Byte[] bytesBoxes = new Byte[s.getBytes().length];
+        int counter = 0;
+        for (byte localByte : s.getBytes()) {
+            bytesBoxes[counter++] = localByte;
+        }
+        recipeSpy.setImages(bytesBoxes);
+
+        //when
+        when(recipeServiceMock.findById(anyLong())).thenReturn(recipeSpy);
+
+        //then
+        final MockHttpServletResponse response = mockMvc.perform(get(String.format("/recipe/%d/recipeimage", recipeId)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        final byte[] returnedByte = response.getContentAsByteArray();
+
+        assertEquals(s.getBytes().length, returnedByte.length);
     }
 }
