@@ -3,6 +3,7 @@ package guru.springframework.controller;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.ImageService;
 import guru.springframework.service.RecipeService;
+import guru.springframework.validator.ArgumentValidator;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,8 +46,9 @@ public class ImageController {
     }
 
     @GetMapping("recipe/{recipeId}/recipeimage")
-    public void renderImageFromDB(@PathVariable Long recipeId, HttpServletResponse response) throws IOException {
-        final Optional<Recipe> recipeOptional = Optional.ofNullable(recipeService.findById(recipeId));
+    public void renderImageFromDB(@PathVariable String  recipeId, HttpServletResponse response) throws IOException {
+        Long recipeIdLong = ArgumentValidator.convertStringToLong(recipeId, String.format("Cannot convert to Long. For input string: %s", recipeId));
+        final Optional<Recipe> recipeOptional = Optional.ofNullable(recipeService.findById(recipeIdLong));
 
         if(recipeOptional.isPresent()) {
             final Recipe recipe = recipeOptional.get();

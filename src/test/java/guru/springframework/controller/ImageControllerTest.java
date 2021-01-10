@@ -38,7 +38,9 @@ class ImageControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(imageController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(imageController)
+                .setControllerAdvice(new ExceptionHandlerController())
+                .build();
     }
 
     @Test
@@ -101,5 +103,15 @@ class ImageControllerTest {
         final byte[] returnedByte = response.getContentAsByteArray();
 
         assertEquals(s.getBytes().length, returnedByte.length);
+    }
+
+    @Test
+    void renderImageFromDBWhenCannotConvertId() throws Exception {
+        //given
+        //then
+        mockMvc.perform(get("/recipe/aaa/recipeimage"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400error"));
+
     }
 }
