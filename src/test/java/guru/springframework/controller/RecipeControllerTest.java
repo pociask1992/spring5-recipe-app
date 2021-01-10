@@ -3,6 +3,7 @@ package guru.springframework.controller;
 import guru.springframework.converter.RecipeConverterFromDTO;
 import guru.springframework.converter.RecipeConverterToDTO;
 import guru.springframework.dto.RecipeDTO;
+import guru.springframework.exception.NotFoundException;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -118,20 +120,13 @@ class RecipeControllerTest {
     @Test
     void findByIdWhenDoesNotFound() {
         //given
-        RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
-
         //when
-        when(recipeService.findById(anyLong())).thenReturn(null);
-        when(recipeConverterToDTO.convert(null)).thenReturn(recipeDTOSpy);
-        String returnedView = recipeController.findById(model, anyLong());
-        ArgumentCaptor<Recipe> recipeArgumentCaptor = ArgumentCaptor.forClass(Recipe.class);
-
-        verify(recipeService, times(1)).findById(anyLong());
-        verify(model, times(1)).addAttribute(eq("recipe"), recipeArgumentCaptor.capture());
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
 
         //then
-        assertEquals(recipeDTOSpy, recipeArgumentCaptor.getValue());
-        assertEquals("/recipe/detailed_recipe", returnedView);
+        assertThrows(NotFoundException.class,
+                () -> recipeController.findById(model, anyLong()));
+
     }
 
     @Test
@@ -155,19 +150,13 @@ class RecipeControllerTest {
     }
 
     @Test
-    void findByIdWebMvcWhenDoesNotFind() throws Exception {
+    void findByIdWebMvcWhenDoesNotFound() throws Exception {
         //given
-        final RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
-
         //when
-        when(recipeService.findById(anyLong())).thenReturn(null);
-        when(recipeConverterToDTO.convert(null)).thenReturn(recipeDTOSpy);
-
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
         //then
         mockMvc.perform(get("/recipe/{id}/show", 1))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/recipe/detailed_recipe"))
-                .andExpect(model().attribute("recipe", recipeDTOSpy));
+                .andExpect(status().isNotFound());
     }
 
     @Test

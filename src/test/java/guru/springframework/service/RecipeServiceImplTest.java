@@ -1,5 +1,6 @@
 package guru.springframework.service;
 
+import guru.springframework.exception.NotFoundException;
 import guru.springframework.model.Recipe;
 import guru.springframework.repository.RecipeRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -11,10 +12,10 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class RecipeServiceImplTest {
@@ -85,5 +86,36 @@ class RecipeServiceImplTest {
         //then
         recipeService.deleteById(id);
         verify(recipeRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    void findByIdWhenRecipeFound() {
+        //given
+        final Recipe recipeSpy = spy(Recipe.class);
+        Long recipeId = 123L;
+        recipeSpy.setId(recipeId);
+
+        //when
+        when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(recipeSpy));
+
+        //then
+        final Recipe foundRecipe = recipeService.findById(recipeId);
+        assertEquals(recipeSpy, foundRecipe);
+    }
+
+    @Test
+    void findByIdWhenRecipeIdIsNull() {
+        assertThrows(RuntimeException.class,
+                () -> recipeService.findById(null));
+    }
+
+    @Test
+    void findByIdWhenRecipeNotFound() {
+        //given
+        //when
+        when(recipeRepository.findById(anyLong())).thenReturn(Optional.empty());
+        //then
+        assertThrows(NotFoundException.class,
+                () -> recipeService.findById(anyLong()));
     }
 }

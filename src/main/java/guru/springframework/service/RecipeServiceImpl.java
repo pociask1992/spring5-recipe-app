@@ -1,5 +1,6 @@
 package guru.springframework.service;
 
+import guru.springframework.exception.NotFoundException;
 import guru.springframework.model.Recipe;
 import guru.springframework.repository.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,9 @@ public class RecipeServiceImpl implements RecipeService {
             toReturn = recipeRepository.findById(recipeId);;
         } else {
             throw new RuntimeException("RecipeServiceImpl.findById recipeId cannot be null.");
+        }
+        if(toReturn.isEmpty()) {
+            throw new NotFoundException(String.format("Recipe not found for recipeId: %d", recipeId));
         }
         return toReturn.orElse(null);
     }
