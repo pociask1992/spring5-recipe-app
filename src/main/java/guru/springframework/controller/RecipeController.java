@@ -23,6 +23,12 @@ public class RecipeController {
     private final RecipeConverterToDTO recipeConverterToDTO;
     private final RecipeConverterFromDTO recipeConverterFromDTO;
 
+    private final String RECIPE_INDEX_VIEW = "/recipe/index";
+    private final String RECIPE_DETAILED_RECIPE_VIEW = "/recipe/detailed_recipe";
+    private final String RECIPE_RECIPE_FORM_VIEW = "/recipe/recipe_form";
+    private final String RECIPE_REDIRECT_RECIPE_SHOW = "redirect:/recipe/%d/show";
+    private final String RECIPE_REDIRECT_RECIPE =  "redirect:/recipe/";
+
     public RecipeController(RecipeService recipeService,
                             RecipeConverterToDTO recipeConverterToDTO,
                             RecipeConverterFromDTO recipeConverterFromDTO) {
@@ -36,7 +42,7 @@ public class RecipeController {
         final Set<Recipe> recipes = recipeService.findAllOrderByDescriptionDescAndIdAsc();
         final Set<RecipeDTO> convertedRecipes = recipeConverterToDTO.convertCollection(recipes);
         model.addAttribute("recipes", convertedRecipes);
-        return "/recipe/index";
+        return RECIPE_INDEX_VIEW;
     }
 
     @GetMapping("/{id}/show")
@@ -45,7 +51,7 @@ public class RecipeController {
         final Recipe foundRecipe = recipeService.findById(recipeIdLong);
         final RecipeDTO convertedRecipe = recipeConverterToDTO.convert(foundRecipe);
         model.addAttribute("recipe", convertedRecipe);
-        return "/recipe/detailed_recipe";
+        return RECIPE_DETAILED_RECIPE_VIEW;
 }
 
     @GetMapping("/{id}/update")
@@ -54,13 +60,13 @@ public class RecipeController {
         final Recipe foundRecipe = recipeService.findById(recipeIdLong);
         final RecipeDTO convertedRecipe = recipeConverterToDTO.convert(foundRecipe);
         model.addAttribute("recipe", convertedRecipe);
-        return "/recipe/recipe_form";
+        return RECIPE_RECIPE_FORM_VIEW;
     }
 
     @GetMapping("/new")
     public String showNewRecipeForm(Model model) {
         model.addAttribute("recipe", new RecipeDTO());
-        return "recipe/recipe_form";
+        return RECIPE_RECIPE_FORM_VIEW;
     }
 
     @PostMapping
@@ -68,7 +74,7 @@ public class RecipeController {
         final Recipe convertRecipe = recipeConverterFromDTO.convert(recipeDTO);
         final Recipe savedRecipe = recipeService.save(convertRecipe);
 
-        return String.format("redirect:/recipe/%d/show", savedRecipe.getId());
+        return String.format(RECIPE_REDIRECT_RECIPE_SHOW, savedRecipe.getId());
     }
 
     @GetMapping("/{id}/delete")
@@ -76,7 +82,7 @@ public class RecipeController {
         Long recipeIdLong = ArgumentValidator.convertStringToLong(id, String.format("Cannot convert to Long. For input string: %s", id));
         recipeService.deleteById(recipeIdLong);
 
-        return "redirect:/recipe/";
+        return RECIPE_REDIRECT_RECIPE;
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)

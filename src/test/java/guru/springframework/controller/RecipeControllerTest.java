@@ -243,7 +243,7 @@ class RecipeControllerTest {
     void showNewRecipeForm() throws Exception {
         mockMvc.perform(get("/recipe/new"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("recipe/recipe_form"))
+                .andExpect(view().name("/recipe/recipe_form"))
                 .andExpect(model().attribute("recipe", isA(RecipeDTO.class)));
     }
 
