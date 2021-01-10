@@ -97,7 +97,8 @@ class RecipeControllerTest {
     @Test
     void findByIdWhenFound() {
         //given
-        Long id = 1L;
+        String recipeIdString = "1";
+        Long id = Long.parseLong(recipeIdString);
         Recipe recipeSpy = spy(Recipe.class);
         recipeSpy.setId(id);
         RecipeDTO recipeDTOSpy = spy(RecipeDTO.class);
@@ -106,7 +107,7 @@ class RecipeControllerTest {
         //when
         when(recipeService.findById(id)).thenReturn(recipeSpy);
         when(recipeConverterToDTO.convert(recipeSpy)).thenReturn(recipeDTOSpy);
-        String returnedView = recipeController.findById(model, id);
+        String returnedView = recipeController.findById(model, recipeIdString);
         ArgumentCaptor<RecipeDTO> recipeArgumentCaptor = ArgumentCaptor.forClass(RecipeDTO.class);
 
         verify(recipeService, times(1)).findById(anyLong());
@@ -125,7 +126,7 @@ class RecipeControllerTest {
 
         //then
         assertThrows(NotFoundException.class,
-                () -> recipeController.findById(model, anyLong()));
+                () -> recipeController.findById(model, "1"));
 
     }
 
@@ -158,6 +159,25 @@ class RecipeControllerTest {
         mockMvc.perform(get("/recipe/{id}/show", 1))
                 .andExpect(status().isNotFound())
                 .andExpect(view().name("404error"));
+    }
+
+    @Test
+    void findByIdWebMvcWhenCannotConvertId() throws Exception {
+        //given
+        //when
+        //then
+        mockMvc.perform(get("/recipe/aaa/show"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400error"));
+    }
+
+    @Test
+    void findByIdWhenCannotConvertId() {
+        //given
+        //when
+        //then
+        assertThrows(NumberFormatException.class,
+                () -> recipeController.findById(model, "aaa"));
     }
 
     @Test
@@ -194,6 +214,26 @@ class RecipeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("/recipe/recipe_form"))
                 .andExpect(model().attribute("recipe", recipeDTOSpy));
+    }
+
+
+    @Test
+    void updateWebMvcWhenCannotConvertId() throws Exception {
+        //given
+        //when
+        //then
+        mockMvc.perform(get("/recipe/aaa/update"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400error"));
+    }
+
+    @Test
+    void updateByIdWhenCannotConvertId() {
+        //given
+        //when
+        //then
+        assertThrows(NumberFormatException.class,
+                () -> recipeController.update(model, "aaa"));
     }
 
     @Test
@@ -239,5 +279,24 @@ class RecipeControllerTest {
             .andExpect(redirectedUrl("/recipe/"));
 
         verify(recipeService, times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    void deleteByIdWebMvcWhenCannotConvertId() throws Exception {
+        //given
+        //when
+        //then
+        mockMvc.perform(get("/recipe/aaa/delete"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400error"));
+    }
+
+    @Test
+    void deleteByIdWhenCannotConvertId() {
+        //given
+        //when
+        //then
+        assertThrows(NumberFormatException.class,
+                () -> recipeController.deleteById("aaa"));
     }
 }

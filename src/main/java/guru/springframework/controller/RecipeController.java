@@ -6,6 +6,7 @@ import guru.springframework.dto.RecipeDTO;
 import guru.springframework.exception.NotFoundException;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
+import guru.springframework.validator.ArgumentValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,16 +40,18 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}/show")
-    public String findById(Model model, @PathVariable("id") Long recipeId) {
-        final Recipe foundRecipe = recipeService.findById(recipeId);
+    public String findById(Model model, @PathVariable("id") String recipeId) {
+        Long recipeIdLong = ArgumentValidator.convertStringToLong(recipeId, String.format("Cannot convert to Long. For input string: %s", recipeId));
+        final Recipe foundRecipe = recipeService.findById(recipeIdLong);
         final RecipeDTO convertedRecipe = recipeConverterToDTO.convert(foundRecipe);
         model.addAttribute("recipe", convertedRecipe);
         return "/recipe/detailed_recipe";
 }
 
     @GetMapping("/{id}/update")
-    public String update(Model model, @PathVariable("id") Long recipeId) {
-        final Recipe foundRecipe = recipeService.findById(recipeId);
+    public String update(Model model, @PathVariable("id") String recipeId) {
+        Long recipeIdLong = ArgumentValidator.convertStringToLong(recipeId, String.format("Cannot convert to Long. For input string: %s", recipeId));
+        final Recipe foundRecipe = recipeService.findById(recipeIdLong);
         final RecipeDTO convertedRecipe = recipeConverterToDTO.convert(foundRecipe);
         model.addAttribute("recipe", convertedRecipe);
         return "/recipe/recipe_form";
@@ -69,8 +72,9 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}/delete")
-    public String deleteById(@PathVariable Long id) {
-        recipeService.deleteById(id);
+    public String deleteById(@PathVariable String id) {
+        Long recipeIdLong = ArgumentValidator.convertStringToLong(id, String.format("Cannot convert to Long. For input string: %s", id));
+        recipeService.deleteById(recipeIdLong);
 
         return "redirect:/recipe/";
     }
@@ -80,6 +84,16 @@ public class RecipeController {
     public ModelAndView handleNotFound(Exception exception) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("404error");
+        modelAndView.addObject("exception", exception);
+        return modelAndView;
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NumberFormatException.class)
+    public ModelAndView handleNumberFormatException(Exception exception) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("400error");
         modelAndView.addObject("exception", exception);
         return modelAndView;
     }
