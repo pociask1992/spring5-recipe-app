@@ -7,14 +7,22 @@ import guru.springframework.exception.NotFoundException;
 import guru.springframework.model.Recipe;
 import guru.springframework.service.RecipeService;
 import guru.springframework.validator.ArgumentValidator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.util.ArrayUtils;
 
+import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Controller
 @RequestMapping("/recipe")
 public class RecipeController {
@@ -70,11 +78,37 @@ public class RecipeController {
     }
 
     @PostMapping
-    public String saveOrUpdateRecipe(@ModelAttribute RecipeDTO recipeDTO) {
-        final Recipe convertRecipe = recipeConverterFromDTO.convert(recipeDTO);
-        final Recipe savedRecipe = recipeService.save(convertRecipe);
+    public String saveOrUpdateRecipe(@Valid @ModelAttribute("recipe") RecipeDTO recipeDTO, BindingResult bindingResult) {
+        String viewToReturn;
+        if(bindingResult.hasErrors()) {
+            final List<ObjectError> allErrors = bindingResult.getAllErrors();
+            allErrors.forEach(objectError -> {
+                prepareErrorMessage(objectError);
+            });
+            viewToReturn = RECIPE_RECIPE_FORM_VIEW;
+        } else {
+            final Recipe convertRecipe = recipeConverterFromDTO.convert(recipeDTO);
 
-        return String.format(RECIPE_REDIRECT_RECIPE_SHOW, savedRecipe.getId());
+            final Recipe savedRecipe = recipeService.save(convertRecipe);
+
+            viewToReturn = String.format(RECIPE_REDIRECT_RECIPE_SHOW, savedRecipe.getId());
+        }
+        return viewToReturn;
+    }
+
+    private void prepareErrorMessage(ObjectError objectError) {
+        StringBuilder errorMessage = new StringBuilder();
+        errorMessage.append("Error on object:");
+        errorMessage.append(objectError.getObjectName());
+        final Object[] objectErrorArguments = objectError.getArguments();
+        if(!ArrayUtils.isEmpty(objectErrorArguments)) {
+            Arrays.asList(objectErrorArguments).forEach(objectErrorArgument -> {
+                errorMessage.append("Argument:");
+                errorMessage.append(objectErrorArgument);
+                errorMessage.append("\n");
+            });
+        }
+        log.error(errorMessage.toString());
     }
 
     @GetMapping("/{id}/delete")

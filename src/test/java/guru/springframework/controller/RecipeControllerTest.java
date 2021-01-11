@@ -265,7 +265,9 @@ class RecipeControllerTest {
         when(recipeService.save(convertedRecipeSpy)).thenReturn(savedRecipeSpy);
 
         //then
-        mockMvc.perform(post("/recipe", recipeDTOSpy))
+        mockMvc.perform(post("/recipe", recipeDTOSpy)
+                        .param("directions","directions")
+                        .param("description", "very tasty meal"))
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl(String.format("/recipe/%d/show", recipeId)));
     }
