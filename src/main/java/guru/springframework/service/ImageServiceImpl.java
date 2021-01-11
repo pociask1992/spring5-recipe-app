@@ -22,24 +22,36 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void saveImageFile(Long recipeId, MultipartFile file) {
         log.info("ImageServiceImpl.saveImageFile - starting");
+        try {
+            saveImageFileByteArray(recipeId, file.getBytes());
+        } catch (IOException e) {
+            log.error(String.format("Problem with saving image. Recipe id:%d", recipeId), e);
+            e.printStackTrace();
+        }
+        log.info("ImageServiceImpl.saveImageFile - ending");
+    }
+
+    @Override
+    public void saveImageFileByteArray(Long recipeId, byte[] byteToSave) {
         final Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
         if(recipeOptional.isPresent()) {
             try {
-                final Byte[] bytesToSave = convertToBytesArray(file.getBytes());
+                final Byte[] bytesToSave = convertToBytesArray(byteToSave);
 
                 final Recipe recipe = recipeOptional.get();
                 recipe.setImages(bytesToSave);
 
                 recipeRepository.save(recipe);
-            } catch (IOException e) {
+                log.info(String.format("Image was successfully saved into %d recipe.", recipeId));
+            } catch (Exception e) {
                 log.error(String.format("Problem with saving image. Recipe id:%d", recipeId), e);
                 e.printStackTrace();
             }
         } else {
             log.error(String.format("ImageServiceImpl.saveImageFile Recipe with id: %d not found.", recipeId));
         }
-        log.info("ImageServiceImpl.saveImageFile - ending");
     }
+
 
     private Byte[] convertToBytesArray(byte[] fileBytes) {
         final Byte[] bytesToSave = new Byte[fileBytes.length];

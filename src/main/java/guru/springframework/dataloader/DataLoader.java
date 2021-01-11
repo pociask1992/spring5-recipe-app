@@ -1,16 +1,23 @@
 package guru.springframework.dataloader;
 
 import guru.springframework.model.*;
-import guru.springframework.service.CategoryService;
-import guru.springframework.service.IngredientService;
-import guru.springframework.service.RecipeService;
-import guru.springframework.service.UnitOfMeasureService;
+import guru.springframework.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -23,24 +30,35 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private final CategoryService categoryService;
     private final RecipeService recipeService;
     private final IngredientService ingredientService;
+    private final ImageService imageService;
 
     public DataLoader(UnitOfMeasureService unitOfMeasureService, CategoryService categoryService,
-                      RecipeService recipeService, IngredientService ingredientService) {
+                      RecipeService recipeService, IngredientService ingredientService, ImageService imageService) {
         this.unitOfMeasureService = unitOfMeasureService;
         this.categoryService = categoryService;
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
+        this.imageService = imageService;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         saveCategory();
         saveUnitOfMeasure();
-        saveRecipes();
+        final Iterable<Recipe> savedRecipes = saveRecipes();
+        saveImages(savedRecipes);
+
     }
 
-    private void saveRecipes() {
-        recipeService.save(getRecipes());
+    private void saveImages(Iterable<Recipe> savedRecipes) {
+        savedRecipes.forEach(recipe -> {
+            final Long recipeId = recipe.getId();
+            imageService.saveImageFile(recipeId, readFile(String.format("%d.jpg", recipeId)));
+        });
+    }
+
+    private Iterable<Recipe> saveRecipes() {
+        return recipeService.save(getRecipes());
     }
 
     private Set<Recipe> getRecipes() {
@@ -59,7 +77,6 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         guacamole.setServings(10);
         guacamole.setSource("https://www.simplyrecipes.com/");
         guacamole.setUrl("https://www.simplyrecipes.com/recipes/perfect_guacamole/");
-//        guacamole.setImages(readGuacamoleImage("1"));
         guacamole.addNotes(getGuacamoleNotes());
         assignCategoryToGuacamole(guacamole);
         assignIngredientsToGuacamole(guacamole);
@@ -67,10 +84,33 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         return guacamole;
     }
 
+    private MultipartFile readFile(String fileName) {
+        MultipartFile multipartFileToReturn = null;
+        String path = String.format("/static/images/%s", fileName);
+        try {
+            final URL resource = getClass().getResource(path);
+            File file = Paths.get(resource.toURI()).toFile();
+            FileItem fileItem = new DiskFileItem("mainFile", Files.probeContentType(file.toPath()), false, file.getName(), (int) file.length(), file.getParentFile());
+            InputStream inputStream = new FileInputStream(file);
+            OutputStream outputStream = fileItem.getOutputStream();
+            IOUtils.copy(inputStream, outputStream);
+            multipartFileToReturn = new CommonsMultipartFile(fileItem);
+
+        } catch (FileNotFoundException e) {
+            log.error(String.format("File not found, path:", path), e);
+        } catch (IOException e) {
+            log.error("IOException", e);
+        } catch (URISyntaxException e) {
+            log.error("URISyntaxException", e);
+        }
+
+        return multipartFileToReturn;
+    }
+
     private void assignCategoryToGuacamole(Recipe recipe) {
         log.info("DataLoader.assignCategoryToGuacamole");
         final Category hotDish = categoryService.findByDescription("Hot dish");
-        if(Optional.ofNullable(hotDish).isPresent()) {
+        if (Optional.ofNullable(hotDish).isPresent()) {
             recipe.addCategory(hotDish);
         }
     }
