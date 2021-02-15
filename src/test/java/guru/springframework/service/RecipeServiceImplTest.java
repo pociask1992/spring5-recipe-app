@@ -89,6 +89,15 @@ class RecipeServiceImplTest {
     }
 
     @Test
+    void deleteAll() {
+        //given
+        //when
+        //then
+        recipeService.deleteAll();
+        verify(recipeRepository, times(1)).deleteAll();
+    }
+
+    @Test
     void findByIdWhenRecipeFound() {
         //given
         final Recipe recipeSpy = spy(Recipe.class);

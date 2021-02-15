@@ -7,6 +7,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,8 @@ import java.util.Set;
 
 @Slf4j
 @Component
-public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
+@Profile("default")
+public class DefaultDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
     private final UnitOfMeasureService unitOfMeasureService;
     private final CategoryService categoryService;
@@ -32,8 +34,8 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private final IngredientService ingredientService;
     private final ImageService imageService;
 
-    public DataLoader(UnitOfMeasureService unitOfMeasureService, CategoryService categoryService,
-                      RecipeService recipeService, IngredientService ingredientService, ImageService imageService) {
+    public DefaultDataLoader(UnitOfMeasureService unitOfMeasureService, CategoryService categoryService,
+                             RecipeService recipeService, IngredientService ingredientService, ImageService imageService) {
         this.unitOfMeasureService = unitOfMeasureService;
         this.categoryService = categoryService;
         this.recipeService = recipeService;
@@ -53,7 +55,9 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
     private void saveImages(Iterable<Recipe> savedRecipes) {
         savedRecipes.forEach(recipe -> {
             final Long recipeId = recipe.getId();
-            imageService.saveImageFile(recipeId, readFile(String.format("%d.jpg", recipeId)));
+            String description = recipe.getDescription();
+            description = description.replace(" ", "");
+            imageService.saveImageFile(recipeId, readFile(String.format("%s.jpg", description)));
         });
     }
 

@@ -1,6 +1,6 @@
 package guru.springframework.repository;
 
-import guru.springframework.dataloader.DataLoader;
+import guru.springframework.dataloader.DefaultDataLoader;
 import guru.springframework.model.UnitOfMeasure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +18,7 @@ public class UnitOfMeasureRepositoryITest {
     private UnitOfMeasureRepository unitOfMeasureRepository;
 
     @Autowired
-    private DataLoader dataLoader;
+    private DefaultDataLoader dataLoader;
 
     @Test
     public void findByDescriptionPieces() {

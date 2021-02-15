@@ -9,4 +9,5 @@ public interface CategoryService {
     Iterable<Category> findByIds(Collection<Long> categoryIds);
     Category save(Category categoryToSave);
     Category findByDescription(String description);
+    void deleteAll();
 }

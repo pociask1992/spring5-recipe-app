@@ -84,4 +84,10 @@ public class RecipeServiceImpl implements RecipeService {
         log.debug("RecipeServiceImpl.deleteById");
         recipeRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteAll() {
+        log.debug("RecipeServiceImpl.deleteAll");
+        recipeRepository.deleteAll();
+    }
 }

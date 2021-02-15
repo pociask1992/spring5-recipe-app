@@ -33,4 +33,10 @@ public class CategoryServiceImpl implements CategoryService {
         log.debug("Invoking CategoryServiceImpl.findByDescription");
         return categoryRepository.findByDescription(description);
     }
+
+    @Override
+    public void deleteAll() {
+        log.debug("Invoking CategoryServiceImpl.deleteAll");
+        categoryRepository.deleteAll();
+    }
 }

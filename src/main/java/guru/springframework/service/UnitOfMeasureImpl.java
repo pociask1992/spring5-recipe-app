@@ -57,6 +57,12 @@ public class UnitOfMeasureImpl implements UnitOfMeasureService {
         log.debug("Invoking UnitOfMeasureImpl.findByDescription");
         return unitOfMeasureRepository.findByDescription(description);
     }
+
+    @Override
+    public void deleteAll() {
+        log.debug("Invoking UnitOfMeasureImpl.findByDescription");
+        unitOfMeasureRepository.deleteAll();
+    }
 }
 
 

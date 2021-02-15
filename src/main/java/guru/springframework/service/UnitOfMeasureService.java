@@ -13,4 +13,5 @@ public interface UnitOfMeasureService {
     void save(UnitOfMeasure unitOfMeasureToSave);
     void save(Set<UnitOfMeasure> unitsOfMeasureToSave);
     UnitOfMeasure findByDescription(String description);
+    void deleteAll();
 }
